@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { UserProfile } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Home, Dumbbell, TrendingUp, Crown, Settings, Menu, X } from 'lucide-react';
+import { Home, Dumbbell, TrendingUp, Crown, Settings, Menu, X, LogOut } from 'lucide-react';
 import WorkoutPlans from './WorkoutPlans';
 import ProgressTracker from './ProgressTracker';
 import PremiumSection from './PremiumSection';
@@ -12,9 +12,11 @@ import PremiumSection from './PremiumSection';
 interface DashboardProps {
   profile: UserProfile;
   onResetProfile: () => void;
+  onLogout: () => void;
+  userName: string;
 }
 
-export default function Dashboard({ profile, onResetProfile }: DashboardProps) {
+export default function Dashboard({ profile, onResetProfile, onLogout, userName }: DashboardProps) {
   const [activeTab, setActiveTab] = useState('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -31,7 +33,7 @@ export default function Dashboard({ profile, onResetProfile }: DashboardProps) {
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">
                 FitPro
               </h1>
-              <p className="text-xs text-gray-600">Seu treino personalizado</p>
+              <p className="text-xs text-gray-600">Olá, {userName}!</p>
             </div>
           </div>
           
@@ -106,14 +108,24 @@ export default function Dashboard({ profile, onResetProfile }: DashboardProps) {
                 Premium
               </Button>
             )}
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={onResetProfile}
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Refazer Questionário
-            </Button>
+            <div className="border-t pt-2 mt-2 space-y-2">
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={onResetProfile}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Refazer Questionário
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-red-600"
+                onClick={onLogout}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </Button>
+            </div>
           </div>
         )}
       </header>
@@ -146,7 +158,7 @@ export default function Dashboard({ profile, onResetProfile }: DashboardProps) {
           {/* Home Tab */}
           <TabsContent value="home" className="space-y-6">
             <div className="bg-gradient-to-r from-blue-600 to-orange-500 rounded-2xl p-6 text-white">
-              <h2 className="text-2xl font-bold mb-2">Olá, Atleta! 💪</h2>
+              <h2 className="text-2xl font-bold mb-2">Olá, {userName}! 💪</h2>
               <p className="text-blue-100">
                 Seu plano está pronto. Vamos treinar hoje?
               </p>

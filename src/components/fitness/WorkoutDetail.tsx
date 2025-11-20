@@ -4,7 +4,7 @@ import { WorkoutPlan } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Clock, Flame, Play, CheckCircle2, Dumbbell } from 'lucide-react';
+import { ArrowLeft, Clock, Flame, Play, CheckCircle2, Dumbbell, Video } from 'lucide-react';
 import { useState } from 'react';
 import { levelLabels } from '@/lib/workout-data';
 
@@ -16,6 +16,7 @@ interface WorkoutDetailProps {
 export default function WorkoutDetail({ plan, onBack }: WorkoutDetailProps) {
   const [activeDay, setActiveDay] = useState(0);
   const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set());
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   const currentDay = plan.days[activeDay];
 
@@ -140,19 +141,21 @@ export default function WorkoutDetail({ plan, onBack }: WorkoutDetailProps) {
             {currentDay.exercises.map((exercise, index) => (
               <Card 
                 key={exercise.id}
-                className={`transition-all duration-200 cursor-pointer hover:shadow-md ${
+                className={`transition-all duration-200 border-2 ${
                   completedExercises.has(exercise.id) ? 'border-green-500 bg-green-50' : 'border-gray-200'
                 }`}
-                onClick={() => toggleExercise(exercise.id)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                        completedExercises.has(exercise.id) 
-                          ? 'bg-green-600 text-white' 
-                          : 'bg-gray-200 text-gray-600'
-                      }`}>
+                      <div 
+                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer ${
+                          completedExercises.has(exercise.id) 
+                            ? 'bg-green-600 text-white' 
+                            : 'bg-gray-200 text-gray-600'
+                        }`}
+                        onClick={() => toggleExercise(exercise.id)}
+                      >
                         {completedExercises.has(exercise.id) ? (
                           <CheckCircle2 className="w-5 h-5" />
                         ) : (
@@ -170,6 +173,19 @@ export default function WorkoutDetail({ plan, onBack }: WorkoutDetailProps) {
                       </div>
                       
                       <p className="text-sm text-gray-600 mb-3">{exercise.description}</p>
+                      
+                      {/* Video Button */}
+                      {exercise.videoUrl && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mb-3 border-blue-600 text-blue-600 hover:bg-blue-50"
+                          onClick={() => setSelectedVideo(exercise.videoUrl || null)}
+                        >
+                          <Video className="w-4 h-4 mr-2" />
+                          Ver Vídeo Explicativo
+                        </Button>
+                      )}
                       
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div className="flex items-center gap-1">
@@ -224,6 +240,34 @@ export default function WorkoutDetail({ plan, onBack }: WorkoutDetailProps) {
             </Card>
           )}
         </>
+      )}
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedVideo(null)}
+        >
+          <div 
+            className="bg-white rounded-xl max-w-4xl w-full overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b flex items-center justify-between">
+              <h3 className="font-semibold text-lg">Vídeo Explicativo</h3>
+              <Button variant="ghost" size="icon" onClick={() => setSelectedVideo(null)}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </div>
+            <div className="aspect-video">
+              <iframe
+                src={selectedVideo}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
